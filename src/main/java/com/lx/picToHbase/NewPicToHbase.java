@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NewPicToHbase implements Runnable{
-	public static Logger logger = LogManager.getLogger(NewPicToHbase.class);
+	public static Logger logger = LogManager.getLogger(NewPicToHbase.class.getName());
 
 	private static final String IMG_FAMILY = "cfimg";
 	private static final String FIELD_IMG_CONTENT = "content";

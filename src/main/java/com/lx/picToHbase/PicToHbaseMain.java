@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 
 @SuppressWarnings("unused")
 public class PicToHbaseMain {
-	public static Logger logger = LogManager.getLogger(PicToHbaseMain.class);
+	public static Logger logger = LogManager.getLogger(PicToHbaseMain.class.getName());
 
 	// 户型图片任务ID
 	private static String[] housetypePictaskIds = {""};
