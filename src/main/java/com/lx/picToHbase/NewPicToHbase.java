@@ -180,7 +180,11 @@ public class NewPicToHbase implements Runnable{
 					continue;
 				}
 				byte[] bytes = httpGetImg(client, imgUrl);
-				if(bytes == null)continue;
+				if(bytes == null){
+					logger.error("线程={}, 当前任务ID={}, offset={}, size={}, dataList={}, imgUrl={}httpGetImg失败",
+							Thread.currentThread().getName(), taskId, offset, size, dataList, imgUrl);
+					continue;
+				}
 				Put crawlPut =  new Put(Bytes.toBytes(imgUrl));
 				crawlPut.addColumn(Bytes.toBytes(IMG_FAMILY), Bytes.toBytes(FIELD_IMG_CONTENT), bytes);
 				crawlPut.addColumn(Bytes.toBytes("cf"), Bytes.toBytes("fileSaveFlag"), Bytes.toBytes("true"));
@@ -192,19 +196,19 @@ public class NewPicToHbase implements Runnable{
 		}catch (Exception e){
 			logger.error("线程={}, 当前任务ID={}, offset={}, size={}, dataList={}, 执行异常:",
 					Thread.currentThread().getName(), taskId, offset, size, dataList, e);
-			throw new RuntimeException("putPicInData执行异常", e);
 		}finally {
 			if(client!=null){
 				try {
 					client.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.error("线程={}, 当前任务ID={}, offset={}, size={}, dataList={}, putPicInData, client.close()执行异常:",
+							Thread.currentThread().getName(), taskId, offset, size, dataList, e);
 				}
 			}
 		}
 	}
 
-	public static byte[] httpGetImg(CloseableHttpClient client,String imgUrl) {
+	public static byte[] httpGetImg(CloseableHttpClient client,String imgUrl) throws Exception{
 		// 发送get请求
 		HttpGet request = new HttpGet(imgUrl);
 		// 设置请求和传输超时时间
@@ -225,7 +229,7 @@ public class NewPicToHbase implements Runnable{
 				  /*FileUtils.copyInputStreamToFile(in, new File(savePath));
 				  System.out.println("下载图片成功:"+imgUrl);*/
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		} finally {
