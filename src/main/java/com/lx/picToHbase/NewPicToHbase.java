@@ -191,8 +191,8 @@ public class NewPicToHbase implements Runnable{
 				list.add(crawlPut);
 			}
 			crawlTable.put(list);
-			logger.debug("线程={}, 当前任务ID={}, offset={}, size={}, dataList={}, list={}",
-					Thread.currentThread().getName(), taskId, offset, size, dataList, list);
+			logger.debug("线程={}, 当前任务ID={}, offset={}, size={}, dataList.size={}, list.size={}",
+					Thread.currentThread().getName(), taskId, offset, size, dataList==null?0:dataList.size(), list==null?0:list.size());
 		}catch (Exception e){
 			logger.error("线程={}, 当前任务ID={}, offset={}, size={}, dataList={}, 执行异常:",
 					Thread.currentThread().getName(), taskId, offset, size, dataList, e);
