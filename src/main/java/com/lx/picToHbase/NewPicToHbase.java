@@ -3,6 +3,7 @@ package com.lx.picToHbase;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -180,7 +181,10 @@ public class NewPicToHbase implements Runnable{
 			for (int i = 0; i < dataList.size(); i++) {
 				JSONObject housedata = dataList.getJSONObject(i);
 				imgUrl = housedata.getString("图片url");
-				if (null == imgUrl) {
+				if (StringUtils.isBlank(imgUrl)) {
+					imgUrl = housedata.getString("图片");
+				}
+				if (StringUtils.isBlank(imgUrl)) {
 					continue;
 				}
 				Get get = new Get(Bytes.toBytes(imgUrl));
