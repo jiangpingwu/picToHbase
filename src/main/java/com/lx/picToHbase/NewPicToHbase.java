@@ -27,6 +27,7 @@ import java.util.Map;
 
 public class NewPicToHbase implements Runnable{
 	public static Logger logger = LogManager.getLogger(NewPicToHbase.class.getName());
+	public static Logger loggerFail = LogManager.getLogger("com.lx.NewPicToHbaseFail");
 
 	private static final String IMG_FAMILY = "cfimg";
 	private static final String FIELD_IMG_CONTENT = "content";
@@ -75,7 +76,7 @@ public class NewPicToHbase implements Runnable{
 						Thread.currentThread().getName(), taskId, offset, size, (System.currentTimeMillis() - start)*0.001);
 				if (restTotal > 0) {
 					offset = offset + size;
-					/*if(offset > 10000){
+					/*if(offset > 20000){
 						logger.debug("线程={}, 当前任务ID={}抓取完成, 总耗时={}秒",
 							Thread.currentThread().getName(), taskId,(System.currentTimeMillis() - begin)*0.001);
 						break;
@@ -142,13 +143,19 @@ public class NewPicToHbase implements Runnable{
 				} else {
 					logger.error("线程={}, 当前任务ID={}, offset={}, size={}, url={}, 八爪鱼接口调用返回数据为空",
 							Thread.currentThread().getName(), taskId, offset, size, url);
+					loggerFail.error("线程={}, 当前任务ID={}, offset={}, size={}, url={}, 八爪鱼接口调用返回数据为空",
+							Thread.currentThread().getName(), taskId, offset, size, url);
 				}
 			} else {
 				logger.error("线程={}, 当前任务ID={}, offset={}, size={}, url={}, 八爪鱼接口请求失败",
 						Thread.currentThread().getName(), taskId, offset, size, url);
+				loggerFail.error("线程={}, 当前任务ID={}, offset={}, size={}, url={}, 八爪鱼接口请求失败",
+						Thread.currentThread().getName(), taskId, offset, size, url);
 			}
 		}catch (Exception e){
 			logger.error("线程={}, 当前任务ID={}, offset={}, size={}, url={}, 八爪鱼接口请求异常:",
+					Thread.currentThread().getName(), taskId, offset, size, url, e);
+			loggerFail.error("线程={}, 当前任务ID={}, offset={}, size={}, url={}, 八爪鱼接口请求异常:",
 					Thread.currentThread().getName(), taskId, offset, size, url, e);
 		}finally {
 			try {
@@ -168,12 +175,13 @@ public class NewPicToHbase implements Runnable{
 	private void putPicInData(JSONArray dataList, Table crawlTable, String taskId, int offset, int size){
 		//long start = System.currentTimeMillis();
 		CloseableHttpClient client =null;
+		String imgUrl = null;
 		try {
 			client =   HttpClients.createDefault();
 			ArrayList<Put> list = new ArrayList<Put>();
 			for (int i = 0; i < dataList.size(); i++) {
 				JSONObject housedata = dataList.getJSONObject(i);
-				String imgUrl = housedata.getString("图片url");
+				imgUrl = housedata.getString("图片url");
 				if (null == imgUrl) {
 					continue;
 				}
@@ -188,6 +196,8 @@ public class NewPicToHbase implements Runnable{
 				if(bytes == null){
 					logger.error("线程={}, 当前任务ID={}, offset={}, size={}, dataList={}, imgUrl={}, httpGetImg失败",
 							Thread.currentThread().getName(), taskId, offset, size, dataList, imgUrl);
+					loggerFail.error("线程={}, 当前任务ID={}, offset={}, size={}, imgUrl={}, httpGetImg失败",
+							Thread.currentThread().getName(), taskId, offset, size, imgUrl);
 					continue;
 				}
 				Put crawlPut =  new Put(Bytes.toBytes(imgUrl));
@@ -201,6 +211,8 @@ public class NewPicToHbase implements Runnable{
 		}catch (Exception e){
 			logger.error("线程={}, 当前任务ID={}, offset={}, size={}, dataList={}, 执行异常:",
 					Thread.currentThread().getName(), taskId, offset, size, dataList, e);
+			loggerFail.error("线程={}, 当前任务ID={}, offset={}, size={}, imgUrl={}, 执行异常:",
+					Thread.currentThread().getName(), taskId, offset, size, imgUrl, e);
 		}finally {
 			if(client!=null){
 				try {
