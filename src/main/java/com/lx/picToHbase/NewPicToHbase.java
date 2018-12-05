@@ -186,7 +186,7 @@ public class NewPicToHbase implements Runnable{
 				}
 				byte[] bytes = httpGetImg(client, imgUrl);
 				if(bytes == null){
-					logger.error("线程={}, 当前任务ID={}, offset={}, size={}, dataList={}, imgUrl={}httpGetImg失败",
+					logger.error("线程={}, 当前任务ID={}, offset={}, size={}, dataList={}, imgUrl={}, httpGetImg失败",
 							Thread.currentThread().getName(), taskId, offset, size, dataList, imgUrl);
 					continue;
 				}
