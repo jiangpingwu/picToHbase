@@ -76,14 +76,12 @@ public class NewPicToHbase implements Runnable{
 						Thread.currentThread().getName(), taskId, offset, size, (System.currentTimeMillis() - start)*0.001);
 				if (restTotal > 0) {
 					offset = offset + size;
-					/*if(offset > 20000){
+					/*if(offset > 30000){
 						logger.debug("线程={}, 当前任务ID={}抓取完成, 总耗时={}秒",
 							Thread.currentThread().getName(), taskId,(System.currentTimeMillis() - begin)*0.001);
 						break;
 					}*/
 				} else {
-					/*crawlTable.close();
-					connection.close();*/
 					logger.debug("线程={}, 当前任务ID={}抓取完成, 总耗时={}秒",
 							Thread.currentThread().getName(), taskId,(System.currentTimeMillis() - begin)*0.001);
 					break;
